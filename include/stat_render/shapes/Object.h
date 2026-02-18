@@ -7,14 +7,15 @@
 class Object{
 public:
     // API
-    Bound bound;
-    Material* material;
+    
     // 1. Ojbect x Ray
     virtual Hit intersect(const Ray& ray) = 0;
     // 2. Bounding Box
-    //virtual Bound getBound() = 0;
+    virtual Bound getBound() = 0;
+    virtual Material* getMaterial() = 0;
     Object() {}
     
-    Object(Material* m) : material(m) {};
     virtual ~Object() = default;
+
+    virtual float SurfaceArea() = 0;
 };

@@ -43,6 +43,6 @@ Hit Sphere::intersect(const Ray& ray)
     payload.position = ray(payload.tmin);
     payload.material= material;
     payload.normal = (payload.position - center).normalized();
-      
+    payload.incident = -ray.direct;
     return payload;
 }

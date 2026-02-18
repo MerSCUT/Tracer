@@ -19,4 +19,13 @@ inline constexpr float inv_Pi = 1./Pi;
 inline constexpr float Epsilon = 1e-5f;
 
 inline constexpr float deg2rad(float deg) { return deg * Pi / 180.0f; }
+// 球面坐标映射到3D方向向量
+inline Vector3f SphTo3D(float theta, float phi)
+{
+    return Vector3f(
+        std::sin(theta)*std::cos(phi),
+        std::sin(theta)*std::sin(phi),
+        std::cos(theta)
+    );
+}
 inline std::string output_path = "../images/output.ppm";

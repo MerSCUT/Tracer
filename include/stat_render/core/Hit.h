@@ -6,10 +6,17 @@ struct Hit
 {
     bool intersected;
     Point3f position;
+    Vector3f incident;      // outwards
     Vector3f normal;
     Material* material;
     float tmin;
-    // time (Ray x Bounding Box)
 
-    Hit() : intersected(false), position(Point3f(0.,0.,0.)), normal(Vector3f(0.,0.,0.)), material(nullptr), tmin(0.f) {}
+    Hit() : 
+    intersected(false), 
+    position(Point3f(0.,0.,0.)), 
+    incident(Vector3f(0.,0.,0.)), 
+    normal(Vector3f(0.,0.,0.)), 
+    material(nullptr), 
+    tmin(std::numeric_limits<float>::max()) {}
+
 };

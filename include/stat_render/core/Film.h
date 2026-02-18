@@ -9,7 +9,7 @@ private:
     int width, height;
     std::vector<Color3f> frame_buffer;
 public:
-    Film() : width(256), height(256) { frame_buffer.resize(width * height); }
+    Film() : width(64), height(64) { frame_buffer.resize(width * height); }
     Film(int w, int h) : width(w), height(h)
     {
         frame_buffer.resize(width * height);

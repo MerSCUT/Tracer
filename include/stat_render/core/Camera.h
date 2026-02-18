@@ -1,5 +1,6 @@
 #pragma once
 #include"stat_render/core/common.h"
+#include"Film.h"
 class Camera 
 {
 private:
@@ -9,15 +10,15 @@ private:
     float fov;      // deg
 public:
 
-    Camera(Point3f p, Vector3f r, Vector3f u, float asp = 1, float _fov = 90) :
+    Camera(Point3f p, Vector3f r, Vector3f u, float asp = 1., float _fov = 90.) :
     pos(p), right(r), up(u), aspect(asp), fov(_fov) {}
 
     Camera() : 
     pos(Point3f(0.,0.,0.)),
     right(Vector3f(1., 0., 0.)),
     up(Vector3f(0., 1., 0.)),
-    aspect(1),
-    fov(90) {}
+    aspect(1.),
+    fov(90.) {}
 
     
 
