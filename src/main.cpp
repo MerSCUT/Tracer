@@ -137,7 +137,7 @@ void test_BVH()
     scene.loadOBJ(path);
     Bound b = scene.getObjects()[0]->getBound();
     
-    Film film(256,256);
+    Film film(512,512);
     Point3f position(0.f, 0.f, 3.0f);
     // 视线方向
     Vector3f gaze(0.0f, -1.0f, -1.0f);
@@ -145,7 +145,7 @@ void test_BVH()
     // 视线顶上的方向 (Y轴正向)
     Vector3f up(0.0f, 1.0f, 0.0f);
     Camera camera(position, gaze, up, film);
-    Renderer renderer(scene, film, camera);
+    Renderer renderer(scene, film, camera, Mode::NormalMap);
     renderer.RenderPipeline(scene, film);
 
     film.Write("../images/test_BVH.ppm");

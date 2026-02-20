@@ -29,7 +29,25 @@ Color3f Renderer::CastRay(const Ray& ray, const Scene& scene)
 {
     if (Hit temp = scene.intersect(ray); temp.intersected)
     {
+        // normal
+        switch (mode)
+        {
+        case Mode::NormalMap :
+            
+            auto n = temp.normal;
+            // [-1,1] -> [0,1]
+            
+            float R = n.x() * 0.5f + 0.5f;
+            float G = n.y() * 0.5f + 0.5f;
+            float B = n.z() * 0.5f + 0.5f;
+            
+            return Color3f(255. * R, 255. * G,255. * B);
+
+            break;
+        }
+
+
         return Color3f(255.0f, 0.f, 0.f);
     }
-    return Color3f(0.f,0.f,255.f);
+    return Color3f(199.f,233.f,233.f);
 }
