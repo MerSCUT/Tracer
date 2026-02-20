@@ -22,12 +22,12 @@ public:
     {
         std::shared_ptr<Material> m = std::make_shared<Diffuse>();
 
-        AddObject(Parser::loadOBJ(path, m));
+        AddObject(Parser::loadOBJ(path, m, true));
     }
     
-    inline std::vector<Object*> getObjects() { return objects; }
-    inline std::vector<Light*> getLights() { return lights; }
+    inline std::vector<Object*> getObjects() const { return objects; }
+    inline std::vector<Light*> getLights() const { return lights; }
     
-    Hit intersect(const Ray& ray);
+    Hit intersect(const Ray& ray) const;
     
 };

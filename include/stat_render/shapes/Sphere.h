@@ -20,4 +20,5 @@ public:
     bool hit(const Ray & ray);     
     Hit intersect(const Ray& ray) override;
     inline float SurfaceArea() override { return 4.f * Pi * radius * radius; }
+    inline Point3f getCenter() override { return center; }
 };

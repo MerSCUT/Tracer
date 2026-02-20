@@ -7,6 +7,7 @@
 #include"stat_render/scenes/Scene.h"
 #include"stat_render/shapes/Triangle.h"
 #include"stat_render/renderers/Renderer.h"
+#include<ctime>
 void test_outputImage()
 {
     Film film(32,32);
@@ -121,7 +122,7 @@ void test_loadOBJ()
     Vector3f up(0.0f, 1.0f, 0.0f);
     Camera camera(position, right, up, film);
     Renderer renderer(scene, film, camera);
-    renderer.RenderPipeline(film);
+    renderer.RenderPipeline(scene, film);
 
     film.Write("../images/test_OBJloadeAndRenderer.ppm");
 
@@ -129,9 +130,33 @@ void test_loadOBJ()
     return;
 }
 
+void test_BVH()
+{
+    Scene scene;
+    std::string path("../asset/bunny/bunny.obj");
+    scene.loadOBJ(path);
+    Bound b = scene.getObjects()[0]->getBound();
+    
+    Film film(256,256);
+    Point3f position(0.f, 0.f, 3.0f);
+    // 视线方向
+    Vector3f gaze(0.0f, -1.0f, -1.0f);
+
+    // 视线顶上的方向 (Y轴正向)
+    Vector3f up(0.0f, 1.0f, 0.0f);
+    Camera camera(position, gaze, up, film);
+    Renderer renderer(scene, film, camera);
+    renderer.RenderPipeline(scene, film);
+
+    film.Write("../images/test_BVH.ppm");
+
+    std::cout << "Finish" << std::endl;
+    return;
+}
+
 int main()
 {
-    test_loadOBJ();
+    test_BVH();
     return 0;
     
     std::random_device rd;

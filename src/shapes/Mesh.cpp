@@ -7,22 +7,22 @@ Mesh::Mesh(const std::vector<Vector3f>& vertices,
     // 1. 根据索引数据创建 Triangle 实例
     Bound b;
     for (size_t i = 0; i < indices.size(); i += 3) {
-        auto t = std::make_shared<Triangle>(
+        auto t = new Triangle(
             vertices[indices[i]], 
             vertices[indices[i+1]], 
             vertices[indices[i+2]], 
             m
         );
         triangles.push_back(t);
-        b = b.Union(t->getBound());
-        
+        b.Union(t->getBound());
     }
-    bound = b;
-    //this->bvh = new BVHAccel(triangles, SAH); 
+    
+    this->bound = b;
+    this->bvh = new BVH(triangles); 
 }
 
 // Without BVH acceleration
-Hit Mesh::intersect(const Ray& ray)
+Hit Mesh::intersectWithoutBVH(const Ray& ray)
 {
     Hit payload;
     for(auto& tri : triangles)
@@ -31,4 +31,19 @@ Hit Mesh::intersect(const Ray& ray)
         payload = temp;
     }
     return payload;
+}
+
+Hit Mesh::intersect(const Ray& ray)
+{
+    //return intersectWithoutBVH(ray);
+    return bvh->intersect(ray);
+}
+
+Mesh::~Mesh()
+{
+    // triangles 里的 std::vector<Object*> 要全部删除.
+    for(auto& obj : triangles)
+    {
+        delete obj;
+    }
 }

@@ -1,7 +1,10 @@
 #pragma once
 #include<stat_render/core/common.h>
 #include"stat_render/materials/Material.h"
+
 // Intersection pakcages between Ray and Object / Bounding Box
+class Object;
+
 struct Hit
 {
     bool intersected;
@@ -10,6 +13,7 @@ struct Hit
     Vector3f normal;
     Material* material;
     float tmin;
+    Object* obj;
 
     Hit() : 
     intersected(false), 

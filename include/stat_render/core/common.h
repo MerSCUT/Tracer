@@ -16,7 +16,7 @@ inline Vector3f Cross(Vector3f v1, Vector3f v2) {return v1.cross(v2); }
 inline constexpr float Inf = std::numeric_limits<float>::infinity();
 inline constexpr float Pi = 3.1415926535897932384626;
 inline constexpr float inv_Pi = 1./Pi;
-inline constexpr float Epsilon = 1e-5f;
+inline constexpr float Epsilon = 1e-7f;
 
 inline constexpr float deg2rad(float deg) { return deg * Pi / 180.0f; }
 // 球面坐标映射到3D方向向量

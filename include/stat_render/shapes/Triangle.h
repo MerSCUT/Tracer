@@ -31,14 +31,15 @@ public:
 
     Triangle(Point3f v0_, Point3f v1_, Point3f v2_, Material* m) 
     : v0(v0_), v1(v1_), v2(v2_), material(m) {
-        Vector3f pmin = (v0.array() < v1.array()).select(v0, v1);
-        pmin = (pmin.array() < v2.array()).select(pmin,v2);
+        
+        // 使用 Eigen 内置的系数级(coeff-wise)比较
+        Vector3f pmin = v0.cwiseMin(v1).cwiseMin(v2);
+        Vector3f pmax = v0.cwiseMax(v1).cwiseMax(v2);
 
-        Vector3f pmax = (v0.array() > v1.array()).select(v0,v1);
-        pmax = (pmax.array() > pmax.array()).select(pmax,v2);
-
-        bound = Bound(pmin, pmax);
-    } 
+        // 此时调用 Bound 的构造函数
+        // 务必确保 Bound 的构造函数内部执行了“膨胀(Padding)”逻辑
+        bound = Bound(pmin, pmax); 
+    }
 
     
 
@@ -77,4 +78,9 @@ public:
     bool hit(const Ray& ray);
 
     inline float SurfaceArea() override { return 1.0f; }
+    inline Point3f getCenter() override {  
+        return (v0 + v1 + v2) * 1./3.; 
+    }
+
+    Hit getHit(const Ray& ray);
 };
