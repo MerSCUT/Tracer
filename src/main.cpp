@@ -7,7 +7,7 @@
 #include"stat_render/scenes/Scene.h"
 #include"stat_render/shapes/Triangle.h"
 #include"stat_render/renderers/Renderer.h"
-#include<ctime>
+#include <chrono> 
 // void test_outputImage()
 // {
 //     Film film(32,32);
@@ -182,14 +182,18 @@ void test_trace()
     };
 
     // Loading
+
+
+
+
     std::cout << "[Info] 开始导入场景模型..." << std::endl;
-    clock_t start_import = clock();
+    auto start_import = std::chrono::high_resolution_clock::now();
     //====================================================
     scene.loadOBJlist(paths, emissions, dcs);
     //====================================================
-    clock_t end_import = clock();
-    double import_time = double(end_import - start_import) / CLOCKS_PER_SEC;
-    std::cout << "[Timer] 导入耗时: " << import_time << " 秒\n" << std::endl;
+    auto end_import = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> import_time = end_import - start_import;
+    std::cout << "[Timer] 导入耗时: " << import_time.count() << " 秒\n" << std::endl;
 
     // camera.transform(scene.getNormalizeMatrix());
     Camera camera(
@@ -201,13 +205,13 @@ void test_trace()
     Renderer r;
 
     std::cout << "[Info] 开始执行渲染管线..." << std::endl;
-    clock_t start_render = clock();
+    auto start_render = std::chrono::high_resolution_clock::now();
     //====================================================
     r.RenderMultiThreading(scene, film, camera);
     //====================================================
-    clock_t end_render = clock();
-    double render_time = double(end_render - start_render) / CLOCKS_PER_SEC;
-    std::cout << "[Timer] 渲染耗时: " << render_time << " 秒\n" << std::endl;
+    auto end_render = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> render_time = end_render - start_render;
+    std::cout << "[Timer] 渲染耗时: " << render_time.count() << " 秒\n" << std::endl;
 
     film.Write("../images/test_trace.ppm");
     std::cout << "[Info] 图片输出 : images/test_trace.ppm" << std::endl;

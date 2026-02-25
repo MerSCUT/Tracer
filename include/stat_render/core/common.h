@@ -1,8 +1,8 @@
 #pragma once
-#include<Eigen/Core>
-#include<Eigen/Geometry>
+#include<algorithm>
 #include<string>
 #include"stat_render/core/Vector.h"
+#include<vector>
 
 
 inline constexpr float Inf = std::numeric_limits<float>::infinity();

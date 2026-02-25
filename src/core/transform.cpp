@@ -1,6 +1,6 @@
 #include"stat_render/core/transform.h"
 
-inline Mat4f ViewTransform(const Point3f p, Vec3f g, Vec3f t)
+Mat4f ViewTransform(const Point3f p, Vec3f g, Vec3f t)
 {
     g.normalize();
     t.normalize();
@@ -24,7 +24,7 @@ inline Mat4f ViewTransform(const Point3f p, Vec3f g, Vec3f t)
     return View;
 }
 
-inline Mat4f CameraToWorldTransform(const Point3f p, Vec3f g, Vec3f t)
+Mat4f CameraToWorldTransform(const Point3f p, Vec3f g, Vec3f t)
 {
     g.normalize();
     t.normalize();
@@ -38,7 +38,7 @@ inline Mat4f CameraToWorldTransform(const Point3f p, Vec3f g, Vec3f t)
     return camToWorld;
 }
 
-inline Mat4f PerspectiveTransform()
+Mat4f PerspectiveTransform()
 {
     return Mat4f();
 }

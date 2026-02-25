@@ -1,5 +1,5 @@
 #include"stat_render/scenes/Scene.h"
-
+#include<iostream>
 Hit Scene::intersect(const Ray& ray) const
 {
     Hit payload;
@@ -29,14 +29,15 @@ void Scene::loadOBJlist(const std::vector<std::string>& paths, const std::vector
         
         bound.Union(obj->getBound());
     }
+    // std::cout << bound.getPmin().x << ' ' << bound.getPmin().y << ' ' << bound.getPmin().z << std::endl;
     return;
 }
 
 
- void Scene::loadOBJ(const std::string& path,  Bound& boundbox, const Color3f& emission = Color3f(0.0f, 0.0f, 0.0f), const DiffuseColor dc = DiffuseColor::WHITE)
- {
+void Scene::loadOBJ(const std::string& path,  Bound& boundbox, const Color3f& emission, const DiffuseColor dc)
+{
     std::shared_ptr<Material> m;
-    if (!(emission == Color3f(0.f)))
+    if (emission == Color3f(0.f))
     {
         m = std::make_shared<Diffuse>(dc);
     }

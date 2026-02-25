@@ -10,13 +10,13 @@ public:
         float e[3];
     };
 
-    inline Vec3f() = default;
+    inline Vec3f() : x(0.0f), y(0.0f), z(0.0f) {}
     inline Vec3f(float a) : x(a), y(a), z(a) {}
     inline Vec3f(float _x, float _y, float _z) : x(_x), y(_y), z(_z) {}
     ~Vec3f() = default;
 
-    inline Vec3f& operator+=(Vec3f& other) {x += other.x; y += other.y; z += other.z; return *this;}
-    inline Vec3f& operator-=(Vec3f& other) {x -= other.x; y -= other.y; z -= other.z; return *this;}
+    inline Vec3f& operator+=(const Vec3f& other) { x += other.x; y += other.y; z += other.z; return *this; }
+    inline Vec3f& operator-=(const Vec3f& other) { x -= other.x; y -= other.y; z -= other.z; return *this; }
     inline Vec3f& operator*=(const Vec3f& v) { x*=v.x; y*=v.y; z*=v.z; return *this; }
     inline Vec3f& operator*=(const float t)  { x*=t; y*=t; z*=t; return *this; }
     inline Vec3f& operator/=(const float t)  { 
@@ -28,21 +28,26 @@ public:
     inline Vec3f operator-() const { return Vec3f(-x, -y, -z); }
     inline float operator[](int i) const { return e[i]; }
     inline float& operator[](int i) { return e[i]; }
-    inline float norm2() { return x*x + y*y + z*z; }
-    inline float norm() { return std::sqrt(norm2()); }
-    inline Vec3f normalized() { float len = norm(); return *this/len; }
+    inline float norm2() const  { return x*x + y*y + z*z; }
+    inline float norm() const { return std::sqrt(norm2()); }
+    inline Vec3f normalized() const { 
+        float len = norm();
+        assert(len > 0.0f); 
+        float inv = 1.0f / len; 
+        return Vec3f(x * inv, y * inv, z * inv);
+    }
     inline void normalize() { float len = norm(); *this/=len; }
-    inline Vec3f cross(Vec3f& v) {
+    inline Vec3f cross(const Vec3f& v) const {
         return Vec3f(
                     y * v.z - z * v.y,
                     z * v.x - x * v.z,
                     x * v.y - y * v.x
                 );
     } 
-    inline float dot(Vec3f& v) { return x * v.x + y * v.y + z * v.z; }
-    inline Vec3f cwiseMin(Vec3f& v) { return Vec3f(std::min(x, v.x), std::min(y, v.y), std::min(z, v.z)); }
+    inline float dot(const Vec3f& v) const { return x * v.x + y * v.y + z * v.z; }
+    inline Vec3f cwiseMin(const Vec3f& v) const { return Vec3f(std::min(x, v.x), std::min(y, v.y), std::min(z, v.z)); }
 
-    inline Vec3f cwiseMax(Vec3f& v) { return Vec3f(std::max(x, v.x), std::max(y, v.y), std::max(z, v.z)); }
+    inline Vec3f cwiseMax(const Vec3f& v) const { return Vec3f(std::max(x, v.x), std::max(y, v.y), std::max(z, v.z)); }
 };
 
 
@@ -52,8 +57,8 @@ inline Vec3f operator-(const Vec3f& u, const Vec3f& v) { return Vec3f(u.x - v.x,
 inline Vec3f operator*(const Vec3f& u, const Vec3f& v) { return Vec3f(u.x * v.x, u.y * v.y, u.z * v.z); }
 inline Vec3f operator*(float t, const Vec3f& v) { return Vec3f(t * v.x, t * v.y, t * v.z); }
 inline Vec3f operator*(const Vec3f& v, float t) { return t * v; }
-inline Vec3f operator/(const Vec3f& v, float t) { assert(t != 0.0f && "Division by zero in Vec3f");return (1.0f / t) * v; }
-inline bool operator==(const Vec3f& u, const Vec3f v) { return u.x == v.x && u.y == v.y && u.z == v.z; }
+inline Vec3f operator/(const Vec3f& v, float t) { assert(t != 0.0f && "Division by zero in Vec3f"); return (1.0f / t) * v; }
+inline bool operator==(const Vec3f& u, const Vec3f& v) { return u.x == v.x && u.y == v.y && u.z == v.z; }
 
 inline float dot(const Vec3f& u, const Vec3f& v) {
     return u.x * v.x + u.y * v.y + u.z * v.z;

@@ -1,6 +1,6 @@
 #include"stat_render/accelerators/BVH.h"
 #include<cassert>
-#include<iostream>
+
 // Single-File Tool Functions
 namespace {
     struct Bucket{

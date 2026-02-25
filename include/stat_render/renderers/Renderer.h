@@ -15,7 +15,8 @@ private:
     Mode mode;
 
 public:
-    Renderer(Mode mode_ = Mode::PathTracing):
+    Renderer() : mode(Mode::PathTracing) {}
+    Renderer(Mode mode_):
     mode(mode_) {}
     
     ~Renderer() = default;

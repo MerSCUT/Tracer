@@ -5,6 +5,7 @@
 #include<mutex>
 #include<atomic>
 const int tile_size = 32;        // Tile size
+
 void Renderer::RenderMultiThreading(const Scene& scene, Film& film, const Camera& camera)
 {
     float dis = 1.0f;
@@ -61,7 +62,7 @@ void Renderer::RenderMultiThreading(const Scene& scene, Film& film, const Camera
                     // Ray generation in Camera Standard Space
                     Vec3f dir = Vec3f(u, v, -1);
                     // Transform to world space;
-                    auto M = CameraToWorldTransform(camera.getPosition(), camera.getGaze(), camera.getTop());
+                    Mat4f M = CameraToWorldTransform(camera.getPosition(), camera.getGaze(), camera.getTop());
                     Vec4f ret = M * toVec4D(dir);
                     dir = Vec3f(ret.x, ret.y, ret.z).normalized();
                     Ray ray(Point3f(camera.getPosition()), dir);
@@ -202,6 +203,7 @@ Color3f Renderer::CastRay(const Ray& ray, const Scene& scene, int depth)
                 //assert(cos_thetai >= 0.0f);
                 //assert(cos_thetaip >= 0.0f);
                 L_dir = fr * Li * cos_thetai * cos_thetaip / (dis * ls.pdf) ;
+                int kkk;
             }
 
             Color3f L_indir(0.f, 0.f, 0.f);
@@ -217,19 +219,12 @@ Color3f Renderer::CastRay(const Ray& ray, const Scene& scene, int depth)
             pdf_ind = std::max(pdf_ind, 1e-3f);
 
             Ray ray_ind(p + Epsilon * n_p, wi_ind);
-            {
-                auto fr = payload.material->eval(wi_ind, wo, n_p);
-                auto costhetai = dot(n_p, wi_ind);
-                auto Li = CastRay(ray_ind, scene, depth+1);
-                L_indir = fr * Li * costhetai / (pdf_ind * p_rr);
-                
-                if (L_indir.x >= 1.f || L_indir.y >= 1.f
-                || L_indir.z >= 1.f )
-                {
-                    int breakpoint1 = 10;
-                    int breakpoint = 10;
-                }
-            }
+            
+            auto fr = payload.material->eval(wi_ind, wo, n_p);
+            auto costhetai = dot(n_p, wi_ind);
+            auto Li = CastRay(ray_ind, scene, depth+1);
+            L_indir = fr * Li * costhetai / (pdf_ind * p_rr);
+            
             
             return L_dir + L_indir;
             

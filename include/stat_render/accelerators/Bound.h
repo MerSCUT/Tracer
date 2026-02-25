@@ -2,6 +2,7 @@
 
 #include"stat_render/core/common.h"
 #include"stat_render/core/Ray.h"
+#include"stat_render/core/Matrix.h"
 #include<limits>
 #include<iostream>
 class Bound{
