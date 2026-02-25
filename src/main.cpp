@@ -172,7 +172,7 @@ void test_trace()
     paths.push_back("../asset/cornellbox/shortbox.obj");
     paths.push_back("../asset/cornellbox/tallbox.obj");
     std::vector<Color3f> emissions(paths.size(), Color3f(0.f,0.f,0.f));
-    emissions[2] = Color3f(10.f, 10.f, 10.f);
+    emissions[2] = Color3f(10.f, 8.5f, 3.0f);
     std::vector<DiffuseColor> dcs {
         DiffuseColor::WHITE,
         DiffuseColor::RED,

@@ -17,7 +17,7 @@ public:
         {
         case DiffuseColor::BLUE :
         {
-            albedo = Color3f(0.14, 0.45, 0.091);
+            albedo = Color3f(0.14, 0.14, 0.45);
             break;
         }
         case DiffuseColor::GREEN :
