@@ -5,13 +5,14 @@
 // 随机数序列生成
 class Sampler{
 private:
-    
+    std::random_device rd;
+    unsigned int seed = rd();
     std::mt19937 rng;
     std::uniform_real_distribution<> dist;
 
 
 public:
-    Sampler() : rng(42), dist(0.0f, 1.0f) {}
+    Sampler() : seed(rd()), rng(seed), dist(0.0f, 1.0f) {}
 
     ~Sampler() = default;
     

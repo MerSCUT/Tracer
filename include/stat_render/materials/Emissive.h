@@ -10,7 +10,7 @@ private:
 public:
     Emissive() :  
     map(nullptr),
-    emission(Color3f(255.,255.,255.)) {}
+    emission(Color3f(1.,1.,1.)) {}
     
     Emissive(const Color3f& emission_) : 
     map(nullptr), 

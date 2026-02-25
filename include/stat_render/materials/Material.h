@@ -18,7 +18,7 @@ public:
 
     virtual bool isEmissive() const { return false; }
 
-    virtual Color3f getEmission() const { return Color3f(255.0f,255.0f, 255.0f); }
+    virtual Color3f getEmission() const { return Color3f(1.0f,1.0f, 1.0f); }
 
 
     // 根据出射方向 w_o 采样入射方向 w_i

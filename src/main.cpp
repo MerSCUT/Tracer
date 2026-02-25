@@ -156,7 +156,8 @@ void test_triangle()
 
 void test_trace()
 {
-    Film film(512,512);
+    int resolution = 256;
+    Film film(resolution, resolution);
     Camera camera(
         Point3f(278.f,274.f,-600.f),
         Vector3f(0.f,0.f,1.f),
@@ -171,11 +172,15 @@ void test_trace()
     paths.push_back("../asset/cornellbox/shortbox.obj");
     paths.push_back("../asset/cornellbox/tallbox.obj");
     std::vector<Color3f> emissions(paths.size(), Color3f(0.f,0.f,0.f));
-    emissions[2] = Color3f(255.f, 255.f, 255.f);
-    std::vector<DiffuseColor> dcs(paths.size());
-    dcs[0] = dcs[4] = dcs[5] = DiffuseColor::WHITE;
-    dcs[1] = DiffuseColor::RED;
-    dcs[3] = DiffuseColor::BLUE;
+    emissions[2] = Color3f(10.f, 10.f, 10.f);
+    std::vector<DiffuseColor> dcs {
+        DiffuseColor::WHITE,
+        DiffuseColor::RED,
+        DiffuseColor::WHITE,
+        DiffuseColor::BLUE,
+        DiffuseColor::WHITE,
+        DiffuseColor::WHITE
+    };
     scene.loadOBJlist(paths, emissions, dcs);
     camera.transform(scene.getNormalizeMatrix());
     camera = Camera(
@@ -184,7 +189,7 @@ void test_trace()
         Vector3f(0.f, 1.f, 0.f),
         film, 45
     );
-    Renderer r(scene, film, camera, Mode::NormalMap);
+    Renderer r(scene, film, camera);
     r.RenderPipeline(scene, film);
     film.Write("../images/test_trace.ppm");
     std::cout << "Done" << std::endl;

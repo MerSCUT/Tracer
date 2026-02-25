@@ -78,7 +78,7 @@ public:
         auto l = lights[0];
         Sampler sampler;
         Vector2f u = sampler.get2D();
-        ls = l->sampleLight(u[0], u[1]);
+        ls = l->sampleLight(u.x(), u.y());
         return ls;
         
         // ... 多个光源 :

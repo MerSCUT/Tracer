@@ -33,5 +33,5 @@ public:
 
     
 
-    Color3f CastRay(const Ray& ray, const Scene& scene);
+    Color3f CastRay(const Ray& ray, const Scene& scene, int depth);
 };

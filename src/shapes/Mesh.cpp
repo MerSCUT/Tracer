@@ -63,7 +63,7 @@ void Mesh::sample(float xi1, float xi2, Point3f& position, Vector3f& normal, flo
     for(auto& tri: triangles)
     {
         sum += tri->SurfaceArea();
-        if (sum > u) 
+        if (sum / sum_S > u) 
         {
             tri->sample(xi1, xi2, position, normal, pdf);
             pdf = 1.0f / sum_S;

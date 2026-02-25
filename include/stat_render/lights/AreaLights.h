@@ -8,7 +8,7 @@ private:
     Color3f radiance;
     Object* obj;           // 发光的几何体
 public:
-    AreaLight(Object* objptr, Color3f intensity_) : obj(objptr), radiance(intensity_) 
+    AreaLight(Object* objptr, Color3f radiance_) : obj(objptr), radiance(radiance_) 
     {}
 
     ~AreaLight() = default;

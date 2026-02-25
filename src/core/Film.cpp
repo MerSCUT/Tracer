@@ -14,7 +14,10 @@ void Film::Write(std::string path)
         for(int i = 0; i < width; i++)
         {
             auto c = frame_buffer[j*width + i];
-            f << c[0] << ' ' << c[1] << ' ' << c[2] << '\n';
+            c.x() = std::pow(c.x(), 1.0f / 2.2f);
+            c.y() = std::pow(c.y(), 1.0f / 2.2f);
+            c.z() = std::pow(c.z(), 1.0f / 2.2f);
+            f << c[0] * 255.f << ' ' << c[1]*255.f << ' ' << c[2]*255.f << '\n';
         }
     }
     f.close();

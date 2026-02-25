@@ -3,6 +3,7 @@
 #include<iostream>
 void Renderer::RenderPipeline(const Scene& scene, Film& film)
 {
+    int samp = 16;
     int progress = 0;
     for(int j = 0; j < film.getHeight(); j++)
     {
@@ -14,13 +15,18 @@ void Renderer::RenderPipeline(const Scene& scene, Film& film)
             // Ray generation
             Vector3f dir = Vector3f(u, v, -1);
             auto M = CameraToWorldTransform(camera.getPosition(), camera.getGaze(), camera.getTop());
-            
             Vector4f ret = M * VectorTo4D(dir);
             dir = Vector3f(ret.x(), ret.y(), ret.z()).normalized();
             Ray ray(Point3f(camera.getPosition()), dir);
 
-            auto res = CastRay(ray, scene);
-            film.set(i,j, res);
+            for(int s = 0; s < samp; s++)
+            {
+                auto res = CastRay(ray, scene, 0);
+                
+                film.add(i,j, res/(float)samp);
+            }
+            
+            
             progress++;
             std::cout << "\r进度: " << progress << " / " << film.getHeight() * film.getWidth() << std::flush;
         }
@@ -28,8 +34,9 @@ void Renderer::RenderPipeline(const Scene& scene, Film& film)
     std::cout << std::endl;
 }
 
-Color3f Renderer::CastRay(const Ray& ray, const Scene& scene)
+Color3f Renderer::CastRay(const Ray& ray, const Scene& scene, int depth)
 {
+    if (depth > 5) return Color3f(0.f, 0.f, 0.f);
     if (Hit payload = scene.intersect(ray);  
     payload.intersected)
     {
@@ -52,38 +59,63 @@ Color3f Renderer::CastRay(const Ray& ray, const Scene& scene)
             LightSample ls = scene.sampleLight();
             auto p = payload.position;
             auto l = ls.position;
-            Vector3f wi = (l - p ).normalized();    // outwards
+            Vector3f wi = (l - p).normalized();    // outwards
+            auto n_p = payload.normal;
+            auto n_l = ls.normal;
             // 相交测试
-            Ray test(p, wi);
+            Ray test(p + Epsilon * n_p, wi);
+
             auto hit_test = scene.intersect(test);
             // if ((test(hit_test.tmin) - payload.position).norm() > (ls.position - payload.position).norm())
-            if (Dot(test(hit_test.tmin) - l, wi) >= 0) 
+            
+            if ((test(hit_test.tmin) - p).norm() + Epsilon >= (l-p).norm()) 
             {
-                // light-obj 与 wi 同向, 未被阻挡
+                
                 Vector3f wo = payload.incident.normalized();
-                auto n_p = payload.normal;
-                auto n_l = ls.normal;
+                
 
                 // 根据 payload.material 计算 L_o
                 // L_o = fr * L_i * Dot(n, wi) * Dot(-n_l, wi) / Dot(p-l, p-l) / ls.pdf_A
                 auto fr = payload.material->eval(wi, wo, n_p);
                 auto Li = ls.radiance;
                 auto cos_thetai = Dot(n_p, wi);
-                auto cos_thetaip = Dot(n_l, wi);
+                cos_thetai = cos_thetai > 0.0f ? cos_thetai : 0.0f;
+                auto cos_thetaip = std::abs(Dot(n_l, wi));
                 
 
-                assert(cos_thetaip >= 0.f);
+                //assert(cos_thetaip >= 0.f);
                 auto dis = Dot(p-l, p-l);
-                
+                assert(cos_thetai >= 0.0f);
+                assert(cos_thetaip > 0.0f);
                 L_dir = fr * Li * cos_thetai * cos_thetaip / (dis * ls.pdf) ;
             }
 
             Color3f L_indir(0.f, 0.f, 0.f);
             // Russian Roulette
+            float p_rr = 0.8f;
+            Sampler sampler;
+            auto u = sampler.get1D(); 
+            if (u >= p_rr) return L_dir;
+            Vector3f wo = (ray.origin - p).normalized();
+            // 采样入射方向 wi (局部)
+            Vector3f wi_ind = payload.material->sample(wo, n_p).normalized();
+            float pdf_ind = payload.material->pdf(wi_ind, wo, n_p);
+            pdf_ind = std::max(pdf_ind, 1e-3f);
 
-            // 采样入射方向 wi
-
-            // 采样入射方向.
+            Ray ray_ind(p + Epsilon * n_p, wi_ind);
+            {
+                auto fr = payload.material->eval(wi_ind, wo, n_p);
+                auto costhetai = Dot(n_p, wi_ind);
+                auto Li = CastRay(ray_ind, scene, depth+1);
+                L_indir = fr * Li * costhetai / (pdf_ind * p_rr);
+                
+                if (L_indir.x() >= 1.f || L_indir.y() >= 1.f
+                || L_indir.z() >= 1.f )
+                {
+                    int breakpoint1 = 10;
+                    int breakpoint = 10;
+                }
+            }
             
             return L_dir + L_indir;
             
@@ -108,8 +140,8 @@ Color3f Renderer::CastRay(const Ray& ray, const Scene& scene)
             
             
         }
-        return Color3f(255.0f, 0.f, 0.f);
+        return Color3f(1.f, 0.f, 0.f);
     }
     //return Color3f(0.f, 0.f, 0.f);
-    return Color3f(199.f,233.f,233.f);
+    return Color3f(199.f/255.f,233.f/255.f,233.f/255.f);
 }
