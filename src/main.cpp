@@ -193,7 +193,7 @@ void test_trace()
 
     camera.transform(scene.getNormalizeMatrix());
     camera = Camera(
-        Point3f(0.f, 0.f, -3.f),
+        Point3f(0.f, 0.f, -3.5f),
         Vector3f(0.f, 0.f, 1.f),
         Vector3f(0.f, 1.f, 0.f),
         film, 45
