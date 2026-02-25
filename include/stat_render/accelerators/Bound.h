@@ -59,7 +59,6 @@ public:
         auto max_extent = MaxExtent();
         float scale = (max_extent > 1e-8f) ? (2.0f / max_extent) : 1.0f;
         // 先平移
-        std::cout << "Scale with " << max_extent << std::endl;
         M << scale, 0.0f,  0.0f,  -scale * center.x(),
             0.0f,  scale, 0.0f,  -scale * center.y(),
             0.0f,  0.0f,  scale, -scale * center.z(),

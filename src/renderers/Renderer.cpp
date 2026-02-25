@@ -1,9 +1,108 @@
 #include"stat_render/renderers/Renderer.h"
 #include"stat_render/core/transform.h"
 #include<iostream>
+#include<thread>
+#include<mutex>
+#include<atomic>
+const int tile_size = 32;        // Tile size
+void Renderer::RenderMultiThreading(const Scene& scene, Film& film)
+{
+    int spp = SPP;      // from common.h
+    int progress = 0;
+    int w = film.getWidth();
+    int h = film.getHeight();
+    int total = w * h;
+    
+
+    struct Tile{ 
+        int row_st, col_st, row_ed, col_ed;         // [st, ed)
+    };
+    // 渲染分块
+    std::vector<Tile> tiles;
+    for(int j = 0; j < h; j += tile_size)
+    {
+        for(int i = 0; i < w; i += tile_size)
+        {
+            tiles.push_back(
+                { i, j, std::min(i + tile_size, w), std::min(j + tile_size, h) }
+            );
+        }
+    }
+
+    std::atomic<int> globalProgress{0};
+    int nextTile = 0;
+    std::mutex tileMutex;
+
+    auto worker = [&]()
+    {
+        while(1)
+        {
+            // 从 tiles 中取出下一个
+            Tile tile;
+            {
+                std::unique_lock<std::mutex> lock{tileMutex};
+                if (nextTile >= tiles.size()) break;
+                tile = tiles[nextTile++];
+            }
+            int localProgress = 0;
+
+            for(int j = tile.col_st; j < tile.col_ed; j++)
+            {
+                for(int i = tile.row_st; i < tile.row_ed; i++)
+                {
+                    float u = l + (float)(i+0.5f)/(float)(film.getWidth()) * (r-l);
+                    float v = -b - (float)(j+0.5f)/(float)(film.getHeight()) * (t-b);
+                    // Ray generation in Camera Standard Space
+                    Vector3f dir = Vector3f(u, v, -1);
+                    // Transform to world space;
+                    auto M = CameraToWorldTransform(camera.getPosition(), camera.getGaze(), camera.getTop());
+                    Vector4f ret = M * VectorTo4D(dir);
+                    dir = Vector3f(ret.x(), ret.y(), ret.z()).normalized();
+                    Ray ray(Point3f(camera.getPosition()), dir);
+                    // Start rendering
+                    Color3f result = Color3f(0.0f,0.0f,0.0f);
+                    for(int s = 0; s < spp; s++)
+                    {
+                        auto res = CastRay(ray, scene, 0);
+                        result += res/(float)spp;
+                    }
+                    film.add(i,j, result);
+                    localProgress++;
+                }
+                
+            }
+            globalProgress += localProgress;
+            localProgress = 0;
+        }
+        
+    };
+
+    int numThreads = std::thread::hardware_concurrency() - 10;
+    std::cout << "[Info] Find " << numThreads << " kernels" << std::endl;
+    std::vector<std::thread> threads;
+    for(int k = 0; k < numThreads; k++)
+    {
+        threads.emplace_back(worker);
+    }
+
+    while (globalProgress < total) {
+        int current = globalProgress.load();
+        float percent = (float)current / total * 100.0f;
+        std::cout << "\r进度: " << current << " / " << total 
+                  << " (" << percent << "%)    " << std::flush;
+        std::this_thread::sleep_for(std::chrono::milliseconds(100)); // 0.1s interval
+    }
+    for(int i = 0; i < numThreads; i++)
+    {
+        threads[i].join();
+    }
+    
+    return;
+}
+
 void Renderer::RenderPipeline(const Scene& scene, Film& film)
 {
-    int samp = 16;
+    int spp = SPP;          // from common.h
     int progress = 0;
     for(int j = 0; j < film.getHeight(); j++)
     {
@@ -19,11 +118,11 @@ void Renderer::RenderPipeline(const Scene& scene, Film& film)
             dir = Vector3f(ret.x(), ret.y(), ret.z()).normalized();
             Ray ray(Point3f(camera.getPosition()), dir);
 
-            for(int s = 0; s < samp; s++)
+            for(int s = 0; s < spp; s++)
             {
                 auto res = CastRay(ray, scene, 0);
                 
-                film.add(i,j, res/(float)samp);
+                film.add(i,j, res/(float)spp);
             }
             
             
@@ -50,7 +149,10 @@ Color3f Renderer::CastRay(const Ray& ray, const Scene& scene, int depth)
             Material* w = payload.obj->getMaterial();
             if (payload.obj->getMaterial()->isEmissive())
             {
+                if (depth == 0)
                 return payload.obj->getMaterial()->getEmission();
+                else 
+                return Color3f(0.f,0.f,0.f);
             }
             
             // 非光源
@@ -85,8 +187,8 @@ Color3f Renderer::CastRay(const Ray& ray, const Scene& scene, int depth)
 
                 //assert(cos_thetaip >= 0.f);
                 auto dis = Dot(p-l, p-l);
-                assert(cos_thetai >= 0.0f);
-                assert(cos_thetaip > 0.0f);
+                //assert(cos_thetai >= 0.0f);
+                //assert(cos_thetaip >= 0.0f);
                 L_dir = fr * Li * cos_thetai * cos_thetaip / (dis * ls.pdf) ;
             }
 
@@ -142,6 +244,6 @@ Color3f Renderer::CastRay(const Ray& ray, const Scene& scene, int depth)
         }
         return Color3f(1.f, 0.f, 0.f);
     }
-    //return Color3f(0.f, 0.f, 0.f);
+    return Color3f(0.f, 0.f, 0.f);
     return Color3f(199.f/255.f,233.f/255.f,233.f/255.f);
 }

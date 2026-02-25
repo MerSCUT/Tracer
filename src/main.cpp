@@ -156,7 +156,6 @@ void test_triangle()
 
 void test_trace()
 {
-    int resolution = 256;
     Film film(resolution, resolution);
     Camera camera(
         Point3f(278.f,274.f,-600.f),
@@ -177,22 +176,42 @@ void test_trace()
         DiffuseColor::WHITE,
         DiffuseColor::RED,
         DiffuseColor::WHITE,
-        DiffuseColor::BLUE,
+        DiffuseColor::GREEN,
         DiffuseColor::WHITE,
         DiffuseColor::WHITE
     };
+
+    // Loading
+    std::cout << "[Info] 开始导入场景模型..." << std::endl;
+    clock_t start_import = clock();
+    //====================================================
     scene.loadOBJlist(paths, emissions, dcs);
+    //====================================================
+    clock_t end_import = clock();
+    double import_time = double(end_import - start_import) / CLOCKS_PER_SEC;
+    std::cout << "[Timer] 导入耗时: " << import_time << " 秒\n" << std::endl;
+
     camera.transform(scene.getNormalizeMatrix());
     camera = Camera(
-        Point3f(0.f, 0.f, -4.f),
+        Point3f(0.f, 0.f, -3.f),
         Vector3f(0.f, 0.f, 1.f),
         Vector3f(0.f, 1.f, 0.f),
         film, 45
     );
     Renderer r(scene, film, camera);
-    r.RenderPipeline(scene, film);
+
+
+    std::cout << "[Info] 开始执行渲染管线..." << std::endl;
+    clock_t start_render = clock();
+    //====================================================
+    r.RenderMultiThreading(scene, film);
+    //====================================================
+    clock_t end_render = clock();
+    double render_time = double(end_render - start_render) / CLOCKS_PER_SEC;
+    std::cout << "[Timer] 渲染耗时: " << render_time << " 秒\n" << std::endl;
+
     film.Write("../images/test_trace.ppm");
-    std::cout << "Done" << std::endl;
+    std::cout << "[Info] 图片输出 : images/test_trace.ppm" << std::endl;
     return;
 }
 int main()

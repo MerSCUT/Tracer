@@ -32,6 +32,6 @@ public:
     void RenderPipeline(const Scene& scene, Film& film);
 
     
-
+    void RenderMultiThreading(const Scene& scene, Film& film);
     Color3f CastRay(const Ray& ray, const Scene& scene, int depth);
 };

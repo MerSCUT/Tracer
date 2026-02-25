@@ -38,7 +38,7 @@ public:
             
             bound.Union(obj->getBound());
         }
-        std::cout << bound.getPmin() << '\n' << bound.getPmax() << std::endl;
+        //std::cout << bound.getPmin() << '\n' << bound.getPmax() << std::endl;
         return;
     }
 
