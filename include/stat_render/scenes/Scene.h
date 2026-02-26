@@ -10,16 +10,18 @@
 class Scene
 {
 private:
-    std::vector<Object*> objects;
-    std::vector<Light*> lights;
+    // std::vector<Object*> objects;
+    std::vector<std::shared_ptr<Object>> objects;
+    // std::vector<Light*> lights;
+    std::vector<std::shared_ptr<Light>> lights;
     std::vector<std::shared_ptr<Material>> material_pool;
     Mat4f M_normalize;
 public:
     Scene() {}
     
     ~Scene() = default;
-    void AddObject(Object* object) { objects.push_back(object); }
-    void AddLight(Light* light) { lights.push_back(light); }
+    void AddObject(std::shared_ptr<Object> object) { objects.push_back(std::move(object)); }
+    void AddLight(std::shared_ptr<Light> light) { lights.push_back(std::move(light)); }
     Mat4f getNormalizeMatrix() { return M_normalize; }
 
     void loadOBJlist(const std::vector<std::string>& paths, const std::vector<Color3f>& emissions, const std::vector<DiffuseColor>& dcs);
@@ -28,8 +30,8 @@ public:
     void loadOBJ(const std::string& path,  Bound& boundbox, const Color3f& emission = Color3f(0.0f, 0.0f, 0.0f), const DiffuseColor dc = DiffuseColor::WHITE);
     
     
-    inline std::vector<Object*> getObjects() const { return objects; }
-    inline std::vector<Light*> getLights() const { return lights; }
+    inline std::vector<std::shared_ptr<Object>> getObjects() const { return objects; }
+    inline std::vector<std::shared_ptr<Light>> getLights() const { return lights; }
     
     Hit intersect(const Ray& ray) const;
     // 在 light 列表里采样

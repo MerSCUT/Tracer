@@ -50,8 +50,7 @@ void Scene::loadOBJ(const std::string& path,  Bound& boundbox, const Color3f& em
     boundbox.Union(mesh->getBound());
     if (!(emission == Color3f(0.f))) 
     {
-        Light* l = new AreaLight(mesh, emission);
-        AddLight(l);
+        AddLight(std::make_shared<AreaLight>(mesh.get(),emission));
     }
     material_pool.push_back(m);
     return;
