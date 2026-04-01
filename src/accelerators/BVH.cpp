@@ -11,7 +11,7 @@ namespace {
     BVHnode* Build(const std::vector<Object*>& objects,  const Bound bp, const int B = 12)
     {
         if (objects.empty()) { return nullptr; }
-        if (objects.size() <= 2 )  { return new BVHnode(objects, bp); }
+        if (objects.size() <= 2)  { return new BVHnode(objects, bp); }
         
         Bucket bucket[B] {};
         // bp 是 objects 的包围盒.

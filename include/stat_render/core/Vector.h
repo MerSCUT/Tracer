@@ -1,6 +1,7 @@
 #pragma once
 #include<cassert>
 #include<cmath>
+#include<iostream>
 class Vec3f
 {
 public:
@@ -33,7 +34,10 @@ public:
     inline float norm() const { return std::sqrt(norm2()); }
     inline Vec3f normalized() const { 
         float len = norm();
-        assert(len > 0.0f); 
+        if (len <= 0.0f){
+            std::cout << "len : " << len << std::endl;
+            assert(len > 0.0f); 
+        }
         float inv = 1.0f / len; 
         return Vec3f(x * inv, y * inv, z * inv);
     }

@@ -14,6 +14,9 @@ void Film::Write(std::string path)
         for(int i = 0; i < width; i++)
         {
             auto c = frame_buffer[j*width + i];
+            c.x = std::clamp(c.x, 0.0f, 1.0f);
+            c.y = std::clamp(c.y, 0.0f, 1.0f);
+            c.z = std::clamp(c.z, 0.0f, 1.0f);
             // Gamma Correction
             c.x = std::pow(c.x, 1.0f / 2.2f);
             c.y = std::pow(c.y, 1.0f / 2.2f);

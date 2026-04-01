@@ -17,7 +17,6 @@ int get_vertex_index(std::string str) {
     return std::stoi(str);
 }
 
-// 接口增加 bool normalize 参数，默认为 true
 std::shared_ptr<Object> Parser::loadOBJ(const std::string& filename, std::shared_ptr<Material> material) {
     std::ifstream file(filename);
     if (!file.is_open()) {
@@ -104,4 +103,3 @@ std::shared_ptr<Object> Parser::loadOBJ(const std::string& filename, std::shared
     auto shared = std::make_shared<Mesh>(vertices, indices, material.get());
     return shared;
 }
-

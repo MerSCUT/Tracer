@@ -29,7 +29,7 @@ public:
     
 
     void loadOBJ(const std::string& path,  Bound& boundbox, const Color3f& emission = Color3f(0.0f, 0.0f, 0.0f), const DiffuseColor dc = DiffuseColor::WHITE);
-    
+    void loadBunny(const std::string& path,  Bound& boundbox, const Color3f& emission, const DiffuseColor dc);
     
     inline std::vector<std::shared_ptr<Object>> getObjects() const { return objects; }
     inline std::vector<std::shared_ptr<Light>> getLights() const { return lights; }

@@ -6,7 +6,7 @@
 #include<atomic>
 #include<stat_render/samplers/QMC.h>
 const int tile_size = 32;        // Tile size
-const int SPP = 32;              // samples number per pixel
+const int SPP = 64;              // samples number per pixel
 
 float PowerHeuristic(float f_pdf, float g_pdf) {
     float f2 = f_pdf * f_pdf;
@@ -243,7 +243,10 @@ Color3f Renderer::CastRay(const Ray& ray, const Scene& scene, int depth, SobolSa
             float p_rr = 0.8f;
             auto u = sampler.get1D(); 
             if (u >= p_rr) return L_dir;
-            Vec3f wo = (ray.origin - p).normalized();
+            Vec3f wo = (ray.origin - p);
+            if (wo.norm2() == 0){
+                return L_dir;
+            }
             // 采样入射方向 wi (局部)
             Vec3f wi_ind = payload.material->sample(wo, n_p, sampler).normalized();
             float pdf_ind = payload.material->pdf(wi_ind, wo, n_p);

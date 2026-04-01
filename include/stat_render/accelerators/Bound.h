@@ -54,7 +54,6 @@ public:
 
     Mat4f getNormalizeMatrix()
     {
-        
         // 不变型
         auto center = Center();
         auto max_extent = MaxExtent();
