@@ -6,21 +6,19 @@
 
 ### 🎯 渲染方法
 - **蒙特卡洛路径追踪（Monte Carlo Path Tracing）**：基于物理的光照积分，支持全局光照与复杂光源交互
-- **多重重要性采样（Multiple Importance Sampling, MIS）**：使用 Power Heuristic 加权策略优化采样效率，显著降低方差
-- **递归光线跟踪**：支持自定义递归深度，完整的光线-场景交互模拟
+- **递归光线跟踪**：自定义递归深度，完整的光线-场景交互模拟
 
 ### 📊 采样优化
 - **Sobol 低差异序列（Quasi-Monte Carlo, QMC）**：替代伪随机数，采用确定性低差异点集，加速收敛、减少噪声
-- **每像素 64 样本（SPP）**：配合 MIS 和 QMC 达到优异质量与性能平衡
 - **维度哈希**：像素级种子生成，保证不同像素的采样独立性
 
 ### ⚡ 加速结构
-- **BVH 树（包围体层次树）**：支持 O(log n) 光线求交加速
+- **BVH 树（包围体层次树）**：支持 $O(\log n)$光线求交加速
 - **表面积启发式（Surface Area Heuristic, SAH）**：动态调整树构建策略（参数 B=12），最小化期望遍历成本
 - **包围盒优化**：AABB 快速求交与轴对齐分割，支持自适应归一化
 
 ### 🧵 并行渲染
-- **多线程分块渲染**：使用 C++ Threads 标准库实现工作窃取（Work Stealing）
+- **多线程分块渲染**：使用 C++ Threads 标准库实现 Work Stealing
 - **Tile-based 分割**：32×32 像素分块独立处理，提高 CPU 缓存命中率与任务平衡
 - **原子操作进度追踪**：实时显示渲染进度，支持动态工作分配
 
@@ -28,16 +26,14 @@
 - **BSDF 接口框架**：`sample()`、`pdf()`、`eval()` 三要素完整设计
 - **漫反射材质**：Lambertian BRDF，余弦加权半球采样
 - **自发光材质**：面光源支持，直接光照与环境光贡献
-- **可扩展架构**：支持镜面反射、微表面、各向异性等材质扩展
+- **可扩展架构**：支持镜面反射、Microfacet、各向异性等材质扩展
 
-### 📐 几何体支持
-- **三角形网格**：支持 OBJ 格式模型加载，任意拓扑网格
-- **球体**：解析求交，参数化纹理坐标
-- **AABB 包围盒**：快速包含性检测与光线求交
-
-### 📝 自主实现的线性代数
+### 📝 线性代数类
 - **Vec3f / Vec4f**：向量类，支持点积、叉积、归一化等基础操作
 - **Mat4f**：4×4 矩阵，支持矩阵乘法、转置、求逆（高斯-约当消元）
+
+## 渲染结果
+<img src="./images/Output.png" alt="Result" style="zoom: 33%;" />
 
 ## 项目结构
 
@@ -139,7 +135,6 @@ render/
 
 - **C++17** 或更高版本
 - **CMake 3.10** 或更高版本
-- **标准库**：`<thread>`、`<vector>`、`<cmath>` 等（已包含）
 
 ### 构建
 
@@ -167,24 +162,15 @@ cmake --build . --parallel
 
 程序将执行 `main.cpp` 中定义的场景，输出渲染结果为 PPM 格式图像文件。
 
-#### 渲染配置
-
-编辑 `src/main.cpp` 修改以下参数：
-
-```cpp
-const int tile_size = 32;        // 分块大小（像素）
-const int SPP = 64;              // 每像素采样数
-const int resolution = 512;      // 输出分辨率（512x512）
-```
-
 ## 核心算法
 
 ### 1. 蒙特卡洛路径追踪
 
 渲染方程的数值求解：
 
-$$L_o(p, \omega_o) = L_e(p, \omega_o) + \int_{\Omega} f_r(p, \omega_i, \omega_o) L_i(p, \omega_i) (\omega_i \cdot n) d\omega_i$$
-
+$$
+L_o(p, \omega_o) = L_e(p, \omega_o) + \int_{\Omega} f_r(p, \omega_i, \omega_o) L_i(p, \omega_i) (\omega_i \cdot n) d\omega_i
+$$
 递归展开与蒙特卡洛估计：
 
 ```
@@ -204,26 +190,9 @@ Color CastRay(Ray, depth):
     return direct + indirect
 ```
 
-### 2. 多重重要性采样（MIS）
 
-Power Heuristic 加权：
 
-$$w(x) = \frac{(p_1(x))^2}{(p_1(x))^2 + (p_2(x))^2}$$
-
-实现：
-
-```cpp
-float PowerHeuristic(float f_pdf, float g_pdf) {
-    float f2 = f_pdf * f_pdf;
-    float g2 = g_pdf * g_pdf;
-    return f2 / (f2 + g2);
-}
-```
-
-- **好处**：同时采样 BSDF 与光源，加权融合，方差减少 30-50%
-- **应用场景**：小光源、镜面反射附近
-
-### 3. Sobol 低差异序列
+### 2. Sobol 低差异序列
 
 相比伪随机数的优势：
 
@@ -246,18 +215,20 @@ class SobolSampler {
 };
 ```
 
-### 4. SAH 优化 BVH
+### 3. SAH 优化 BVH
 
 **构建策略**：
 
 1. **分割**：按 SAH 成本函数选择最优分割面
-   $$C = C_t + C_{left} \cdot \frac{A_{left}}{A_{parent}} \cdot N_{left} + C_{right} \cdot \frac{A_{right}}{A_{parent}} \cdot N_{right}$$
-
+   $$
+   C = C_t + C_{left} \cdot \frac{A_{left}}{A_{parent}} \cdot N_{left} + C_{right} \cdot \frac{A_{right}}{A_{parent}} \cdot N_{right}
+   $$
+   
 2. **启发式参数**：`B = 12` 候选分割位置
 
 3. **递归终止**：当 `N < B` 时停止分割，转为叶子节点
 
-**遍历**：O(log n) 射线-场景求交
+**遍历**：$O(\log n)$ 射线-场景求交
 
 ```cpp
 Hit BVH::intersect(const Ray& ray) {
@@ -265,7 +236,7 @@ Hit BVH::intersect(const Ray& ray) {
 }
 ```
 
-### 5. 多线程渲染架构
+### 4. 多线程渲染架构
 
 **Work Stealing 调度**：
 
@@ -280,136 +251,6 @@ Worker Threads (N-10):
   ├─ 原子操作更新进度
   └─ 工作窃取（无阻塞）
 ```
-
-**性能特点**：
-- 无锁争抢（仅在任务获取时加锁）
-- SIMD 友好（tile 大小优化 L3 缓存）
-- 动态负载均衡（自动分配任务）
-
-## 数据结构与接口
-
-### 渲染方程求解：`Renderer`
-
-```cpp
-class Renderer {
-    // 单线程渲染管线
-    void RenderPipeline(const Scene&, Film&, const Camera&);
-    
-    // 多线程渲染管线
-    void RenderMultiThreading(const Scene&, Film&, const Camera&);
-    
-    // 递归光线追踪（核心）
-    Color3f CastRay(const Ray&, const Scene&, int depth, 
-                    SobolSampler&, bool bounced, float prev_pdf);
-};
-```
-
-### BSDF 材质系统：`Material`
-
-```cpp
-class Material {
-    // 根据入射方向 wi 与法线 n 采样出射方向
-    virtual Vec3f sample(const Vec3f& wi, const Vec3f& n, 
-                         SobolSampler&) = 0;
-    
-    // 计算采样到 wi 的概率密度
-    virtual float pdf(const Vec3f& wi, const Vec3f& wo, 
-                      const Vec3f& n) = 0;
-    
-    // 计算双向反射分布函数值
-    virtual Color3f eval(const Vec3f& wi, const Vec3f& wo, 
-                         const Vec3f& n) = 0;
-    
-    virtual bool isEmissive() const { return false; }
-};
-```
-
-### 加速结构：`BVH`
-
-```cpp
-class BVH {
-    // 从对象列表构建 SAH-optimized 树
-    BVH(const std::vector<Object*>&, int B = 12);
-    
-    // 光线求交
-    Hit intersect(const Ray& ray);
-};
-```
-
-### 几何求交：`Object`
-
-```cpp
-class Object {
-    virtual Hit intersect(const Ray& ray) const = 0;
-    virtual Bound getBound() const = 0;
-};
-```
-
-## 使用示例
-
-### 基础场景构建
-
-```cpp
-#include "stat_render/scenes/Scene.h"
-#include "stat_render/renderers/Renderer.h"
-
-int main() {
-    // 1. 创建场景与相机
-    Scene scene;
-    Film film(512, 512);
-    Point3f pos(0.f, 0.f, 3.f);
-    Camera camera(pos, ...);
-    
-    // 2. 加载模型
-    scene.loadOBJ("asset/bunny/bunny.obj");
-    
-    // 3. 配置渲染器
-    Renderer renderer(Mode::PathTracing);
-    
-    // 4. 执行渲染（多线程）
-    renderer.RenderMultiThreading(scene, film, camera);
-    
-    // 5. 保存结果
-    film.Write("output.ppm");
-    
-    return 0;
-}
-```
-
-### 自定义材质
-
-```cpp
-class CustomMaterial : public Material {
-public:
-    Vec3f sample(const Vec3f& wi, const Vec3f& n, 
-                 SobolSampler& sampler) override {
-        // 用 sampler 生成随机方向
-        float u = sampler.Next1D();
-        float v = sampler.Next1D();
-        return GenerateDirection(u, v, n);
-    }
-    
-    float pdf(const Vec3f& wi, const Vec3f& wo, 
-              const Vec3f& n) override {
-        return ComputePDF(wi, wo, n);
-    }
-    
-    Color3f eval(const Vec3f& wi, const Vec3f& wo, 
-                 const Vec3f& n) override {
-        return Color3f(BRDF_value);
-    }
-};
-```
-
-## 性能参考
-
-**测试环境**：Intel Core i7-10700K（8核），512×512 分辨率，64 SPP
-
-| 场景 | 几何体数 | 渲染时间 | 吞吐量 |
-|-----|--------|---------|------|
-| 单球体 | 1 | 0.2s | 1.6M 射线/s |
-| Stanford Bunny | 69,451 | 8.5s | 2.0M 射线/s |
-| Cornell Box | 3,000 | 5.2s | 1.9M 射线/s |
 
 ## 扩展与改进方向
 
@@ -430,72 +271,18 @@ public:
 
 ## 文档与参考
 
-### 本项目文档
-- [光线求交详解](docs/1-RayHitTest.md)
-- [半球采样与蒙特卡洛积分](docs/2-SampleUnitHemisphere.md)
-- [SAH BVH 构建与优化](docs/3-SAH.md)
-- [AABB 包围盒求交算法](docs/4-RayHitBoundingBox.md)
-
-### 经典参考资源
-- **[Physically Based Rendering (3rd Ed.)](https://www.pbrt.org/)**  
-  Matt Pharr, Wenzel Jakob, Greg Humphreys  
-  光线追踪与 PBRT 系统的权威教科书
-
-- **[The Ray Tracer Challenge](https://pragprog.com/titles/jbtracer/the-ray-tracer-challenge/)**  
-  Jamis Buck  
-  实践型光线追踪教程
-
-- **[Real-Time Rendering (4th Ed.)](https://www.realtimerendering.com/)**  
-  Möller, Haines, Hoffman  
-  实时渲染与离线渲染技术综览
-
-- **[Advanced Global Illumination (2nd Ed.)](https://www.elsevier.com/books/advanced-global-illumination/akenine-moller/978-0-12-415950-1)**  
-  Akenine-Möller, Haines  
-  全局光照深度讨论与蒙特卡洛方法
-
-- **[Importance Sampling for Production Rendering](https://www.elsevier.com/books/importance-sampling-for-production-rendering/dutré/978-0-12-381970-9)**  
-  Dutre, Bekaert, Bala  
-  重要性采样与方差减少
-
-### 论文
-- Whitted, T. (1980). "An Improved Illumination Model for Shaded Display"
-- Kajiya, J. T. (1986). "The Rendering Equation"
-- Veach, E., & Guibas, L. J. (1995). "Optimally Combining Sampling Techniques"
+- **Physically Based Rendering (3rd Ed.)**  
+- **Ray Tracing in One Weekend**
+- **Fundamentals of Computer Graphics, Fourth Edition**
+- **Games101**
 
 ## 许可证
 
 MIT License - 详见 [LICENSE](LICENSE) 文件
 
-## 贡献指南
-
-欢迎提交 Issue 和 Pull Request！
-
-### 开发建议
-1. 遵循现有代码风格（Google C++ Style）
-2. 添加功能前请讨论设计
-3. 配置算法文档说明
-4. 测试新材质与加速结构
-
 ---
 
 **项目创始**：2025  
 **最后更新**：2026 年 4 月  
-**维护者**：[Your Name]  
-**状态**：活跃开发中 🚀
-
----
-
-## 常见问题
-
-**Q: 为什么不用 Eigen3？**  
-A: 自主实现线性代数库以深入理解算法细节，减少依赖，提高代码透明度和可定制性。
-
-**Q: Sobol 序列相比伪随机有多大优势？**  
-A: 在 64 SPP 下，Sobol 通常可降低 30-40% 的噪声；随 SPP 增加，优势更明显（O(log N/N) 收敛）。
-
-**Q: BVH 的 B 参数如何选择？**  
-A: `B=12` 是通用最优值。更小的 B 导致更深树（遍历慢），更大的 B 导致叶子节点过大（求交慢）。
-
-**Q: 支持 GPU 渲染吗？**  
-A: 目前为纯 CPU 实现，未来规划 CUDA 版本以获得 10-100x 加速。
+**维护者**：Mergic  
 
