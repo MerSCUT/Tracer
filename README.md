@@ -169,8 +169,11 @@ cmake --build . --parallel
 渲染方程的数值求解：
 
 $$
+
 L_o(p, \omega_o) = L_e(p, \omega_o) + \int_{\Omega} f_r(p, \omega_i, \omega_o) L_i(p, \omega_i) (\omega_i \cdot n) d\omega_i
+
 $$
+
 递归展开与蒙特卡洛估计：
 
 ```
