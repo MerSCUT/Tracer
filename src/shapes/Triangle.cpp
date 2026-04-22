@@ -10,7 +10,7 @@ Hit Triangle::intersect(const Ray& ray)
     Vec3f e2 = v2 - v0;
 
     
-    Vec3f pvec = cross(ray.direct, e2);
+    Vec3f pvec = cross(ray.direct, e2); // S1
     
     
     float det = dot(e1, pvec);
@@ -21,7 +21,7 @@ Hit Triangle::intersect(const Ray& ray)
     }
 
     float invDet = 1.0f / det;
-    Vec3f tvec = ray.origin - v0;
+    Vec3f tvec = ray.origin - v0;       // S
 
     
     
@@ -31,7 +31,7 @@ Hit Triangle::intersect(const Ray& ray)
     }
 
     
-    Vec3f qvec = cross(tvec, e1);
+    Vec3f qvec = cross(tvec, e1);       // S2
     float v = dot(ray.direct, qvec) * invDet;
     if (v < -Epsilon || u + v > 1.0f + Epsilon) {
         return payload;

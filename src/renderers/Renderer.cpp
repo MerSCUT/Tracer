@@ -26,7 +26,8 @@ void Renderer::RenderMultiThreading(const Scene& scene, Film& film, const Camera
     int w = film.getWidth();
     int h = film.getHeight();
     int total = w * h;
-    std::cout<< "[Info] Tile size : " << tile_size << std::endl;
+    std::cout << "[Info] Mode : Multi-Threading" << std::endl;
+    std::cout << "[Info] Tile size : " << tile_size << std::endl;
     std::cout << "[Info] SPP : " << SPP << std::endl;
     std::cout << "[Info] Resolution : " << resolution << " * " << resolution << std::endl; 
 
@@ -129,10 +130,10 @@ void Renderer::RenderPipeline(const Scene& scene, Film& film, const Camera& came
 
     int spp = SPP;          // from common.h
     int progress = 0;
-
+    std::cout << "[Info] Mode : Single-Threading" << std::endl;
     std::cout << "[Info] SPP : " << SPP << std::endl;
     std::cout << "[Info] Resolution : " << resolution << " * " << resolution << std::endl; 
-
+    
     for(int j = 0; j < film.getHeight(); j++)
     {
         for(int i = 0; i < film.getWidth(); i++)

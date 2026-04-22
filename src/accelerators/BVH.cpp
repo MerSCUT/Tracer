@@ -166,3 +166,7 @@ Hit BVH::intersect(const Ray& ray)
     // 递归
     return intersectBVH(ray, head);
 }
+
+void BVH::Dense(){
+    // 将 head 中的结构转储到 std::vector<> 中
+}
