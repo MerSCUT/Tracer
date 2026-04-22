@@ -166,16 +166,6 @@ cmake --build . --parallel
 
 ### 1. Monte-Carlo 路径追踪
 
-渲染方程的数值求解：
-
-$$
-
-L_o(p, \omega_o) = L_e(p, \omega_o) + \int_{\Omega} f_r(p, \omega_i, \omega_o) L_i(p, \omega_i) (\omega_i \cdot n) d\omega_i
-
-$$
-
-递归展开与蒙特卡洛估计：
-
 ```
 Color CastRay(Ray, depth):
     if depth > max_depth: return 0
@@ -223,9 +213,6 @@ class SobolSampler {
 **构建策略**：
 
 1. **分割**：按 SAH 成本函数选择最优分割面
-   $$
-   C = C_t + C_{left} \cdot \frac{A_{left}}{A_{parent}} \cdot N_{left} + C_{right} \cdot \frac{A_{right}}{A_{parent}} \cdot N_{right}
-   $$
    
 2. **启发式参数**：`B = 12` 候选分割位置
 
