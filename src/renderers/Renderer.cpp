@@ -6,7 +6,7 @@
 #include<atomic>
 #include<stat_render/samplers/QMC.h>
 const int tile_size = 32;        // Tile size
-const int SPP = 64;              // samples number per pixel
+const int SPP = 16;              // samples number per pixel
 
 float PowerHeuristic(float f_pdf, float g_pdf) {
     float f2 = f_pdf * f_pdf;
@@ -249,7 +249,13 @@ Color3f Renderer::CastRay(const Ray& ray, const Scene& scene, int depth, SobolSa
                 return L_dir;
             }
             // 采样入射方向 wi (局部)
-            Vec3f wi_ind = payload.material->sample(wo, n_p, sampler).normalized();
+            Vec3f wi_ind = payload.material->sample(wo, n_p, sampler);
+            // =============
+            if (wi_ind.norm2() == 0){
+                return L_dir;
+            }
+            assert(wi_ind.norm2() > 0 && "Sample 0 vector in indirect light");
+            wi_ind = wi_ind.normalized();
             float pdf_ind = payload.material->pdf(wi_ind, wo, n_p);
             pdf_ind = std::max(pdf_ind, 1e-3f);
 

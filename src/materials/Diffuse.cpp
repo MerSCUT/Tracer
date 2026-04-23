@@ -71,6 +71,8 @@ Vec3f Diffuse::sample(const Vec3f& wi, const Vec3f& n, SobolSampler& sampler)
         t = Vec3f(0.0f, n.z * invLen, -n.y * invLen);
     }
     Vec3f b = cross(n, t);
+    auto wo = x * t + y * b + z * n;
+    assert(wo.norm2() > 0 && "Diffuse Sample 0 vector");
 
     return x * t + y * b + z * n;
 }

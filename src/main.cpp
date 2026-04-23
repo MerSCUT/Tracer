@@ -212,7 +212,7 @@ void test_trace()
     std::cout << "[Info] 开始执行渲染管线..." << std::endl;
     auto start_render = std::chrono::high_resolution_clock::now();
     //====================================================
-    //r.RenderPipeline(scene, film, camera);
+    // r.RenderPipeline(scene, film, camera);
     r.RenderMultiThreading(scene, film, camera);
     //====================================================
     auto end_render = std::chrono::high_resolution_clock::now();

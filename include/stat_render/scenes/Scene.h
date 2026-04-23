@@ -4,6 +4,7 @@
 #include"stat_render/lights/AreaLights.h"
 #include"stat_render/materials/Diffuse.h"
 #include"stat_render/materials/Emissive.h"
+#include"stat_render/materials/Microfacet.h"
 #include"stat_render/scenes/parser.h"
 #include<iostream>
 #include<memory>

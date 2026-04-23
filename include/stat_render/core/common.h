@@ -10,7 +10,7 @@ inline constexpr float Pi = 3.1415926535897932384626;
 inline constexpr float inv_Pi = 1./Pi;
 inline constexpr float Epsilon = 1e-5f;
 
-inline constexpr int resolution = 1024;
+inline constexpr int resolution = 512;
 
 inline constexpr float deg2rad(float deg) { return deg * Pi / 180.0f; }
 // 球面坐标映射到3D方向向量
