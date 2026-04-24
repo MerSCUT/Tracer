@@ -24,5 +24,5 @@ public:
     // Pipeline
     void RenderPipeline(const Scene& scene, Film& film, const Camera& camera);
     void RenderMultiThreading(const Scene& scene, Film& film, const Camera& camera);
-    Color3f CastRay(const Ray& ray, const Scene& scene, int depth, SobolSampler& sampler, bool is_bounced_ray = false, float prev_brdf_pdf = 0.f);
+    Color3f CastRay(const Ray& ray, const Scene& scene, int depth, SobolSampler& sampler);
 };

@@ -117,6 +117,7 @@ Color3f Microfacet::eval(const Vec3f & wi, const Vec3f& wo, const Vec3f & n) {
     
     // 计算菲涅尔 F
     Color3f F = FresnelSchlick(VdotH, F0);
+    
 
     // 最终 BRDF 极其简洁，无需再除以任何极小值
     return F * D * V;

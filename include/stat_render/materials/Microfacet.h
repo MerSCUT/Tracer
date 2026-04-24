@@ -4,10 +4,11 @@ class Microfacet : public Material{
 private:
     float roughness = 0;        // [0,1]
     Color3f F0 = 0;             // 基础反射率
+    Color3f albedo = Color3f(0.f);
 public:
     Microfacet() = default;
-    Microfacet(float roughness_, Color3f F0_) : 
-    roughness(roughness_), F0(F0_) {}
+    Microfacet(float roughness_, Color3f F0_, Color3f albedo_) : 
+    roughness(roughness_), F0(F0_), albedo(albedo_) {}
 
     Vec3f sample(const Vec3f& wi, const Vec3f& n, SobolSampler& sampler) override;
     
