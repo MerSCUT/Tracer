@@ -65,9 +65,11 @@ void Scene::loadOBJ(const std::string& path,  Bound& boundbox, const Color3f& em
     return;
 }
 void Scene::loadBunny(const std::string& path,  Bound& boundbox, const Color3f& emission, const DiffuseColor dc){
-    auto m = std::make_shared<Diffuse>(dc
-            // , SamplingStrategy::Uniform
-    );
+    // auto m = std::make_shared<Diffuse>(dc
+    //         // , SamplingStrategy::Uniform
+    // );
+
+    auto m = std::make_shared<Microfacet>(0.5f, Color3f(1.00, 0.71, 0.29), Color3f(0.f));
     auto mesh = Parser::loadOBJ(path, m);
 
     auto M = mesh->getBound().getNormalizeMatrix();      // Normalize
